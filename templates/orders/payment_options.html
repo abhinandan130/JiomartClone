@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row g-4">
+
+        <!-- LEFT: PAYMENT METHODS -->
+        <div class="col-md-7">
+            <div class="card shadow-sm">
+                <div class="card-body">
+
+                    <h5 class="mb-3">Select Payment Method</h5>
+
+                    <form method="post" action="{% url 'confirm_payment' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="order_number" value="{{ order.order_number }}">
+                        <input type="hidden" name="payment_method" id="payment_method">
+
+                        <div class="payment-option" data-method="gpay">
+                            <i class="bi bi-wallet2 payment-bi"></i>
+                            <div>
+                                <strong>Google Pay</strong>
+                                <small>UPI • Fast & secure</small>
+                            </div>
+                        </div>
+
+                        <div class="payment-option" data-method="phonepe">
+                            <i class="bi bi-phone payment-bi"></i>
+                            <div>
+                                <strong>PhonePe</strong>
+                                <small>UPI payment</small>
+                            </div>
+                        </div>
+
+                        <div class="payment-option" data-method="paytm">
+                            <i class="bi bi-credit-card payment-bi"></i>
+                            <div>
+                                <strong>Paytm</strong>
+                                <small>Wallet / UPI</small>
+                            </div>
+                        </div>
+
+                        <div class="payment-option cod" data-method="cod">
+                            <i class="bi bi-cash-stack payment-bi"></i>
+                            <div>
+                                <strong>Cash on Delivery</strong>
+                                <small>Pay when order arrives</small>
+                            </div>
+                        </div>
+
+
+                        <div class="payment-option cod" data-method="cod">
+                            <img src="https://cdn-icons-png.flaticon.com/512/891/891419.png">
+                            <div>
+                                <strong>Cash on Delivery</strong>
+                                <small>Pay when your order arrives</small>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="confirmBtn" class="btn btn-primary w-100 mt-3" disabled>
+                            Place Order
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: ORDER SUMMARY -->
+        <div class="col-md-5">
+            <div class="card shadow-sm checkout-summary">
+                <div class="card-body">
+
+                    <h6 class="mb-3">Order Summary</h6>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Order ID</span>
+                        <strong>{{ order.order_number }}</strong>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Items Total</span>
+                        <span>₹{{ order.total_amount }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Delivery</span>
+                        <span class="text-success">FREE</span>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between fs-5">
+                        <strong>Total Payable</strong>
+                        <strong>₹{{ order.total_amount }}</strong>
+                    </div>
+
+                    <p class="text-muted mt-2 small">
+                        Estimated delivery in 2–3 days
+                    </p>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+{% block extra_js %}
+<script src="{% static 'js/payment_options.js' %}"></script>
+{% endblock %}
+
+{% endblock %}
+

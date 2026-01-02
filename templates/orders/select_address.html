@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Select Address{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h4 class="mb-3">
+        <i class="bi bi-geo-alt me-2"></i> Delivery Address
+    </h4>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% for address in addresses %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <label class="w-100">
+                    <input type="radio" name="address_id" value="{{ address.id }}" required>
+                    <strong>{{ address.full_name }}</strong><br>
+                    {{ address.address_line }},
+                    {{ address.city }} - {{ address.pincode }}
+                </label>
+            </div>
+        </div>
+        {% endfor %}
+
+        <button class="btn btn-success w-100">
+            Deliver to this Address
+        </button>
+    </form>
+
+</div>
+{% endblock %}

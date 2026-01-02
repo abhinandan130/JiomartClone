@@ -122,19 +122,25 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 
 # 🚀 Session Settings
+# 🚀 Session Settings
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 SESSION_COOKIE_HTTPONLY = True
 
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_COOKIE_AGE = 300
+# ✅ User stays logged in until manual logout
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
-SESSION_SAVE_EVERY_REQUEST = False
+# ✅ Session valid for 30 days
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 30  # 30 days
+
+# ✅ Extend session on every request
+SESSION_SAVE_EVERY_REQUEST = True
 
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
 
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
+
 
 
 

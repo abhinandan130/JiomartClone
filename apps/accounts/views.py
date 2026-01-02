@@ -25,7 +25,6 @@ def login_view(request):
             request.session.save()
             return redirect("register_details")
 
-        # Generate OTP
         otp = str(random.randint(100000, 999999))
         user.otp = otp
         user.otp_created_at = timezone.now()
@@ -33,15 +32,16 @@ def login_view(request):
 
         send_otp_email(email, otp)
 
-        # Save session
         request.session["email"] = email
         request.session.save()
 
         return redirect("verify_otp")
 
     return render(request, "accounts/login.html", {
-        "hide_footer": True
+        "hide_footer": True,
+        "hide_navitems": True
     })
+
 
 
 # =========================
@@ -76,7 +76,8 @@ def register(request):
         return redirect("verify_otp")
 
     return render(request, "accounts/register.html", {
-        "hide_footer": True
+        "hide_footer": True,
+        "hide_navitems": True
     })
 
 
@@ -97,7 +98,6 @@ def verify_otp(request):
     if request.method == "POST":
         entered_otp = request.POST.get("otp")
 
-        # OTP expiry
         if user.otp_created_at:
             expiry_time = user.otp_created_at + timedelta(minutes=5)
             if timezone.now() > expiry_time:
@@ -111,7 +111,6 @@ def verify_otp(request):
             if not user.is_registered:
                 return redirect("register_details")
 
-            # ✅ FINAL LANDING PAGE
             return redirect("product_list")
 
         return render(request, "accounts/verify_otp.html", {
@@ -120,7 +119,8 @@ def verify_otp(request):
         })
 
     return render(request, "accounts/verify_otp.html", {
-        "hide_footer": True
+        "hide_footer": True,
+        "hide_navitems": True
     })
 
 
@@ -165,7 +165,8 @@ def register_details(request):
         return redirect("verify_otp")
 
     return render(request, "accounts/details.html", {"email": email}, {
-        "hide_footer": True
+        "hide_footer": True,
+        "hide_navitems": True
     })
 
 
@@ -205,7 +206,8 @@ def profile_view(request):
 
     return render(request, "accounts/profile.html", {
         "user": user,
-        "hide_footer": True
+        "hide_footer": True,
+        "hide_navitems": True
     })
 
 

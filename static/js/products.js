@@ -1,41 +1,56 @@
 document.addEventListener("DOMContentLoaded", () => {
-    fetch("http://127.0.0.1:8000/api/products/")
-        .then(response => response.json())
-        .then(data => {
-            const container = document.getElementById("product-container");
+    const isAuthenticated = document.body.dataset.authenticated === "true";
 
-            if (data.products.length === 0) {
-                container.innerHTML =
-                    "<p class='text-center text-muted'>No products available</p>";
-                return;
+    const showLoginPopup = () => {
+        const modal = new bootstrap.Modal(
+            document.getElementById("loginRequiredModal")
+        );
+        modal.show();
+    };
+
+    const addToCart = async (productId, redirect = false) => {
+        try {
+            const res = await fetch(`/api/cart/add/${productId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCSRFToken()
+                }
+            });
+
+            if (!res.ok) return;
+
+            // 🔥 THIS IS THE MISSING PIECE
+            if (typeof refreshCartCount === "function") {
+                refreshCartCount();   // ✅ updates navbar instantly
             }
 
-            data.products.forEach(product => {
-                container.innerHTML += `
-                    <div class="col-lg-3 col-md-4 col-sm-6">
-                        <div class="card product-card shadow-sm h-100">
+            if (redirect) {
+                window.location.href = "/cart/";
+            }
 
-                            <img src="${product.image}"
-                                class="card-img-top">
+        } catch (err) {
+            console.error("Add to cart error:", err);
+        }
+    };
 
-                            <div class="card-body">
-                                <h6 class="fw-semibold">${product.name}</h6>
-                                <p class="fw-bold text-primary mb-2">₹ ${product.price}</p>
-                            </div>
+    document.addEventListener("click", (e) => {
+        const addBtn = e.target.closest(".add-to-cart-btn");
+        const buyBtn = e.target.closest(".buy-now-btn");
 
-                            <div class="card-footer bg-white border-0">
-                                <button class="btn btn-sm btn-outline-primary w-100">
-                                    Add to Cart
-                                </button>
-                            </div>
+        if (!addBtn && !buyBtn) return;
 
-                        </div>
-                    </div>
-                `;
+        const productId = (addBtn || buyBtn).dataset.productId;
 
-            });
-        })
-        .catch(err => {
-            console.error("Error loading products:", err);
-        });
+        if (!isAuthenticated) {
+            showLoginPopup();
+            return;
+        }
+
+        if (addBtn) addToCart(productId);
+        if (buyBtn) addToCart(productId, true);
+    });
 });
+
+function getCSRFToken() {
+    return document.querySelector("[name=csrfmiddlewaretoken]")?.value;
+}

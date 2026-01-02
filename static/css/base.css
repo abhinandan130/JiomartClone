@@ -3,6 +3,10 @@ body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
+a{
+    text-decoration: none;
+}
+
 .page-wrapper {
     min-height: 100vh;
 }
@@ -24,13 +28,200 @@ body {
     margin-bottom: 20px;
 }
 
+
+/* ===============================
+   ROW 1 NAVBAR
+=============================== */
+
+.jm-topbar {
+    background: #0c5273;
+    color: white;
+    padding: 6px 0;
+    font-size: 14px;
+}
+
+.right-icons {
+    width: 60%;
+    align-items: center;
+}
+
+.search {
+    width: 75%;
+}
+
+
+/* CART HOVER DROPDOWN (CSS ONLY) */
+
+/* Wrapper around cart icon */
+.cart-hover {
+    position: relative;
+}
+
+/* Dropdown box */
+.cart-dropdown {
+    position: absolute;
+    top: 52px;
+    right: -36px;
+    width: 320px;
+    background: #ffffff;
+    padding: 15px 18px;
+    border-radius: 12px;
+    display: none;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+    z-index: 999;
+}
+
+/* Show on hover */
+.cart-hover:hover .cart-dropdown {
+    display: block;
+}
+
+/* Pointer arrow */
+.cart-dropdown::before {
+    content: "";
+    position: absolute;
+    top: -9px;
+    right: 46px;
+    width: 18px;
+    height: 18px;
+    background: #ffffff;
+    transform: rotate(45deg);
+    box-shadow: -3px -3px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Optional: smooth appearance */
+.cart-dropdown {
+    animation: fadeIn 0.15s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* ===============================
+   ROW 2 NAVBAR
+=============================== */
+.jm-midbar {
+    background: #0078ad;
+    padding: 10px 0;
+    /* border-bottom: 1px solid #e6e6e6; */
+}
+
+/* ===============================
+   ROW 3 NAVBAR
+=============================== */
+.nav {
+    height: 60px;
+    border-bottom: 1px solid #eaeaea;
+}
+
+/* WRAPPER */
+.jm-carousel-wrapper {
+    position: relative;
+    width: 85%;
+    background: white;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 30px;
+}
+
+/* SCROLL BUTTONS */
+.carousel-btn {
+    border: none;
+    background: #0078ad;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(0,0,0,0.18);
+    color: #ffffff;
+}
+
+.carousel-btn i {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+/* SCROLL AREA */
+.nav-scroll {
+    flex: 1;                           /* Take the center width */
+    overflow-x: hidden;
+    white-space: nowrap;
+    scroll-behavior: smooth;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;               /* Perfect alignment with buttons */
+}
+
+/* UL */
+.nav-pills {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 25px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    align-items: center;               /* Perfect vertical alignment */
+}
+
+/* Links */
+.nav-link {
+    font-size: 12px;
+    font-weight: bold;
+    padding: 10px 15px;                /* Better vertical alignment */
+    color: #333;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+
+.nav-icon {
+    width: 40px;
+    height: 40px;
+    padding: 5px;
+}
+
+
+
+/* ================= Products cards styling ============================ */
+
+.jm-add-btn {
+    background-color: #ffffff;
+    color: #0078ad;
+    border: none;
+    font-weight: 500;
+    padding: 6px 18px;
+    border-radius: 8px;
+    border: 1px solid #0078ad;
+}
+
+.jm-add-btn:hover {
+    background-color: #006a98;   /* slightly darker hover */
+    color: #fff;
+}
+
+
+
 .btn-primary {
-    background-color: #0a5bdd;
+    background-color: #0c5273;
     border: none;
 }
 
 .btn-primary:hover {
-    background-color: #084bb5;
+    background-color: #0078ad;
 }
 
 .form-control {
@@ -86,7 +277,7 @@ body {
 
 .active-link {
     background-color: #e9f1ff;
-    color: #0a5bdd;
+    color: #0078ad;
     font-weight: 600;
 }
 
@@ -149,4 +340,255 @@ body {
 
 .footer-divider {
     border-color: #e5e7eb;
+}
+
+
+
+/* OVERLAY */
+.address-drawer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    z-index: 1050;
+}
+
+/* DRAWER */
+.address-drawer {
+    position: fixed;
+    top: 0;
+    right: -420px;
+    width: 420px;
+    height: 100%;
+    background: #fff;
+    z-index: 1060;
+    transition: right 0.35s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+/* OPEN STATE */
+.address-drawer.open {
+    right: 0;
+}
+
+/* HEADER */
+.address-drawer-header {
+    padding: 16px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* BODY */
+.address-drawer-body {
+    padding: 16px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+/* FOOTER */
+.address-drawer-footer {
+    padding: 16px;
+    border-top: 1px solid #eee;
+}
+
+/* ADDRESS CARD */
+.address-card {
+    display: flex;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.address-card input {
+    margin-top: 5px;
+}
+
+
+/* =========================
+   REAL CHECKOUT UI
+========================= */
+
+.payment-option {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.payment-option img {
+    width: 40px;
+    height: 40px;
+}
+
+.payment-option small {
+    display: block;
+    color: #6c757d;
+}
+
+.payment-option:hover {
+    background-color: #f8f9fa;
+}
+
+.payment-option.active {
+    border-color: #0d6efd;
+    background-color: #f1f6ff;
+}
+
+.payment-option.cod {
+    border-style: dashed;
+}
+
+.checkout-summary {
+    position: sticky;
+    top: 90px;
+}
+
+.payment-bi {
+    font-size: 32px;
+    color: #0d6efd;
+}
+
+
+
+/* =========================
+   ORDER SUCCESS PAGE
+========================= */
+
+.success-icon i {
+    font-size: 70px;
+    color: #28a745;
+}
+
+.order-box {
+    border: 1px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: left;
+}
+
+.order-box div {
+    margin-bottom: 8px;
+}
+
+
+/* =========================
+   ORDER DETAIL PAGE
+========================= */
+
+.status-badge {
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 20px;
+}
+
+.status-badge.paid {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.status-badge.pending {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.status-badge.cancelled {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+/* Timeline */
+.order-timeline {
+    display: flex;
+    gap: 12px;
+}
+
+.order-timeline .step {
+    flex: 1;
+    text-align: center;
+    padding: 8px;
+    font-size: 13px;
+    border-radius: 20px;
+    background: #e9ecef;
+    color: #6c757d;
+}
+
+.order-timeline .step.active {
+    background: #0d6efd;
+    color: #fff;
+}
+
+/* Product image */
+.order-product-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+
+/* =========================
+   REAL ORDER STATUS TRACKER
+========================= */
+
+.order-status-tracker {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.status-step {
+    text-align: center;
+    flex: 1;
+    position: relative;
+    color: #6c757d;
+}
+
+.status-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 6px;
+    font-size: 18px;
+}
+
+.status-step span {
+    font-size: 13px;
+}
+
+/* completed step */
+.status-step.completed .status-icon {
+    background: #0d6efd;
+    color: #fff;
+}
+
+.status-step.completed span {
+    color: #0d6efd;
+    font-weight: 600;
+}
+
+/* connecting line */
+.status-line {
+    flex: 1;
+    height: 4px;
+    background: #dee2e6;
+}
+
+.status-line.completed {
+    background: #0d6efd;
 }

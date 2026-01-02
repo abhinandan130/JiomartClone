@@ -1,176 +1,80 @@
-// ================================
-// CSRF TOKEN
-// ================================
-function getCSRFToken() {
-    return document.cookie
-        .split("; ")
-        .find(row => row.startsWith("csrftoken="))
-        ?.split("=")[1];
-}
-
-// ================================
-// LOAD CART COUNT (ALWAYS FROM SERVER)
-// ================================
-function loadCartCount() {
-    fetch("/api/cart/count/", {
-        cache: "no-store",
-        headers: { "Accept": "application/json" }
-    })
-    .then(res => res.json())
-    .then(data => {
-        const el = document.getElementById("cart-count");
-        if (!el) return;
-
-        if (data.count > 0) {
-            el.innerText = data.count;
-            el.style.display = "inline-block";
-        } else {
-            el.innerText = "";
-            el.style.display = "none";
-        }
-    })
-    .catch(err => console.error("Cart count error:", err));
-}
-
-// ================================
-// ADD TO CART (HOME PAGE)
-// ================================
-document.addEventListener("click", function (e) {
-    const btn = e.target.closest(".add-to-cart-btn");
-    if (!btn) return;
-
-    const productId = btn.dataset.productId;
-
-    fetch(`/api/cart/add/${productId}/`, {
-        method: "POST",
-        headers: {
-            "X-CSRFToken": getCSRFToken(),
-            "Accept": "application/json"
-        }
-    })
-    .then(async res => {
-        const data = await res.json();
-
-        if (!res.ok || data.error) {
-            alert("Login required to add items to cart.");
-            return;
-        }
-
-        if (data.already_exists) {
-            const confirmUpdate = confirm(
-                "This product is already in your cart.\nDo you want to increase the quantity?"
-            );
-            if (!confirmUpdate) return;
-        }
-
-        // 🔥 Always sync navbar count from DB
-        loadCartCount();
-    })
-    .catch(err => console.error(err));
+document.addEventListener("DOMContentLoaded", () => {
+    if (typeof refreshCartCount === "function") {
+        refreshCartCount();
+    }
 });
 
-// ================================
-// UPDATE QUANTITY (+ / -) — CART PAGE
-// ================================
-document.addEventListener("click", function (e) {
-    const btn = e.target.closest(".qty-btn");
+/* =========================
+   + / - QUANTITY HANDLER
+   ========================= */
+document.addEventListener("click", async (e) => {
+    // ✅ Robust button detection (button OR icon)
+    const btn =
+        e.target.classList.contains("qty-btn")
+            ? e.target
+            : e.target.closest("button.qty-btn");
+
     if (!btn) return;
 
     const itemId = btn.dataset.id;
     const action = btn.dataset.action;
 
-    fetch("/api/cart/update-qty/", {
-        method: "POST",
-        headers: {
-            "X-CSRFToken": getCSRFToken(),
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Accept": "application/json"
-        },
-        body: new URLSearchParams({
-            item_id: itemId,
-            action: action
-        })
-    })
-    .then(async res => {
-        const data = await res.json();
+    try {
+        const res = await fetch(`/api/cart/update/${itemId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken()
+            },
+            body: JSON.stringify({ action })
+        });
 
-        if (!res.ok || data.error) {
-            alert("Login required to update cart.");
+        if (!res.ok) {
+            console.warn("Cart update failed:", res.status);
             return;
         }
 
-        if (!data.success) return;
+        const data = await res.json();
 
-        // Item removed
-        if (data.deleted) {
-            document.getElementById(`row-${itemId}`)?.remove();
-        } else {
-            document.getElementById(`qty-${itemId}`).innerText = data.quantity;
-            document.getElementById(`subtotal-${itemId}`).innerText =
-                `₹${data.item_subtotal}`;
-        }
-
-        // Update cart total
+        const rowEl = document.getElementById(`row-${itemId}`);
+        const qtyEl = document.getElementById(`qty-${itemId}`);
+        const subtotalEl = document.getElementById(`subtotal-${itemId}`);
         const totalEl = document.getElementById("cart-total");
-        if (totalEl) totalEl.innerText = `₹${data.cart_total}`;
 
-        // Empty cart UI
-        if (data.cart_total === 0) {
-            document.getElementById("cart-wrapper")?.classList.add("d-none");
-            document.getElementById("empty-cart")?.classList.remove("d-none");
-        }
+        /* ✅ ITEM REMOVED */
+        if (data.quantity === 0) {
+            if (rowEl) rowEl.remove();
+            if (totalEl) totalEl.textContent = `$ ${data.cart_total}`;
 
-        // 🔥 Keep navbar in sync
-        loadCartCount();
-    })
-    .catch(err => console.error(err));
-});
+            if (typeof refreshCartCount === "function") {
+                refreshCartCount();
+            }
 
-// ================================
-// BUY NOW
-// ================================
-document.addEventListener("click", function (e) {
-    const btn = e.target.closest(".buy-now-btn");
-    if (!btn) return;
-
-    const productId = btn.dataset.productId;
-
-    fetch(`/api/cart/add/${productId}/`, {
-        method: "POST",
-        headers: {
-            "X-CSRFToken": getCSRFToken(),
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Accept": "application/json"
-        },
-        body: new URLSearchParams({
-            mode: "buy_now"
-        })
-    })
-    .then(async res => {
-        const data = await res.json();
-
-        if (!res.ok || data.error) {
-            alert("Login required to buy this product.");
+            // If cart is empty, reload to show empty state
+            if (data.cart_total === 0) {
+                location.reload();
+            }
             return;
         }
 
-        // Sync cart count
-        loadCartCount();
+        /* ✅ NORMAL UPDATE */
+        if (qtyEl) qtyEl.textContent = data.quantity;
+        if (subtotalEl) subtotalEl.textContent = `$ ${data.subtotal}`;
+        if (totalEl) totalEl.textContent = `$ ${data.cart_total}`;
 
-        // 🚀 Redirect if backend sends redirect_url
-        if (data.redirect_url) {
-            window.location.href = data.redirect_url;
+        if (typeof refreshCartCount === "function") {
+            refreshCartCount();
         }
-    })
-    .catch(err => console.error(err));
+
+    } catch (err) {
+        console.error("Cart update error:", err);
+        // Silent UX
+    }
 });
 
-// ================================
-// PAGE LOAD + BACK/FORWARD FIX 🔥
-// ================================
-document.addEventListener("DOMContentLoaded", loadCartCount);
-
-// Handles browser back/forward cache
-window.addEventListener("pageshow", function () {
-    loadCartCount();
-});
+/* =========================
+   CSRF TOKEN
+   ========================= */
+function getCSRFToken() {
+    return document.querySelector("[name=csrfmiddlewaretoken]")?.value;
+}

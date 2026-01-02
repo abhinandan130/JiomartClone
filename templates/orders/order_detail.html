@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container my-4">
+
+    <!-- ORDER HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">
+            <i class="bi bi-receipt me-2"></i>
+            Order {{ order.order_number }}
+        </h4>
+
+        <span class="badge status-badge {{ order.status }}">
+            {{ order.status|upper }}
+        </span>
+    </div>
+
+    <!-- ORDER META -->
+    <div class="text-muted mb-3">
+        Placed on {{ order.created_at|date:"d M Y, h:i A" }}
+    </div>
+
+    <!-- STATUS TIMELINE -->
+    <!-- ORDER STATUS TRACKER -->
+    <div class="order-status-tracker my-4">
+
+        <div class="status-step completed">
+            <div class="status-icon">
+                <i class="bi bi-check-lg"></i>
+            </div>
+            <span>Placed</span>
+        </div>
+
+        <div class="status-line completed"></div>
+
+        <div class="status-step completed">
+            <div class="status-icon">
+                <i class="bi bi-credit-card"></i>
+            </div>
+            <span>Paid</span>
+        </div>
+
+        <div class="status-line"></div>
+
+        <div class="status-step">
+            <div class="status-icon">
+                <i class="bi bi-truck"></i>
+            </div>
+            <span>Shipped</span>
+        </div>
+
+        <div class="status-line"></div>
+
+        <div class="status-step">
+            <div class="status-icon">
+                <i class="bi bi-box-seam"></i>
+            </div>
+            <span>Delivered</span>
+        </div>
+
+    </div>
+
+
+    <!-- PRODUCT CARD -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+
+            {% for item in order.items.all %}
+            <div class="d-flex align-items-center mb-3">
+                <img src="{{ item.product.image.url }}" class="order-product-img me-3">
+                <div class="flex-grow-1">
+                    <h6 class="mb-1">{{ item.product.name }}</h6>
+                    <small class="text-muted">
+                        ₹{{ item.price }} × {{ item.quantity }}
+                    </small>
+                </div>
+                <strong>₹{{ item.subtotal }}</strong>
+            </div>
+            {% endfor %}
+
+            <hr>
+
+            <div class="d-flex justify-content-between fs-5">
+                <strong>Total</strong>
+                <strong class="text-success">₹{{ order.total_amount }}</strong>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="d-flex justify-content-end gap-2">
+        <a href="{% url 'download_invoice' order.order_number %}" class="btn btn-outline-secondary">
+            <i class="bi bi-download me-1"></i> Download Invoice
+        </a>
+
+        <a href="{% url 'my_orders' %}" class="btn btn-primary">
+            Back to Orders
+        </a>
+    </div>
+
+</div>
+{% endblock %}
