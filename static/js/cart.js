@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
    + / - QUANTITY HANDLER
    ========================= */
 document.addEventListener("click", async (e) => {
-    // ✅ Robust button detection (button OR icon)
     const btn =
         e.target.classList.contains("qty-btn")
             ? e.target
@@ -41,7 +40,6 @@ document.addEventListener("click", async (e) => {
         const subtotalEl = document.getElementById(`subtotal-${itemId}`);
         const totalEl = document.getElementById("cart-total");
 
-        /* ✅ ITEM REMOVED */
         if (data.quantity === 0) {
             if (rowEl) rowEl.remove();
             if (totalEl) totalEl.textContent = `$ ${data.cart_total}`;
@@ -50,14 +48,12 @@ document.addEventListener("click", async (e) => {
                 refreshCartCount();
             }
 
-            // If cart is empty, reload to show empty state
             if (data.cart_total === 0) {
                 location.reload();
             }
             return;
         }
 
-        /* ✅ NORMAL UPDATE */
         if (qtyEl) qtyEl.textContent = data.quantity;
         if (subtotalEl) subtotalEl.textContent = `$ ${data.subtotal}`;
         if (totalEl) totalEl.textContent = `$ ${data.cart_total}`;
@@ -68,7 +64,6 @@ document.addEventListener("click", async (e) => {
 
     } catch (err) {
         console.error("Cart update error:", err);
-        // Silent UX
     }
 });
 

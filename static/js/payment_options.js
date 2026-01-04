@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
             toggleActive(options, option);
             paymentInput.value = option.dataset.method;
             confirmBtn.disabled = false;
-            confirmBtn.innerText = "Place Order • ₹" + confirmBtn.dataset.total;
+            confirmBtn.innerText = "Place Order";
         });
     });
 });

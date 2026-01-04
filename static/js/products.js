@@ -19,9 +19,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (!res.ok) return;
 
-            // 🔥 THIS IS THE MISSING PIECE
             if (typeof refreshCartCount === "function") {
-                refreshCartCount();   // ✅ updates navbar instantly
+                refreshCartCount();
             }
 
             if (redirect) {

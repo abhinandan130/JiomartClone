@@ -22,10 +22,7 @@ def add_to_cart(request, product_id):
     cart, _ = Cart.objects.get_or_create(customer_id=customer_id)
     product = get_object_or_404(Product, id=product_id)
 
-    cart_item, created = CartItem.objects.get_or_create(
-        cart=cart,
-        product=product
-    )
+    cart_item, created = CartItem.objects.get_or_create(cart=cart,product=product)
 
     if not created:
         cart_item.quantity += 1
@@ -33,7 +30,6 @@ def add_to_cart(request, product_id):
         cart_item.quantity = 1
 
     cart_item.save()
-
     return JsonResponse({"success": True})
 
 
@@ -112,11 +108,7 @@ def update_cart_quantity(request, item_id):
     data = json.loads(request.body)
     action = data.get("action")
 
-    cart_item = get_object_or_404(
-        CartItem,
-        id=item_id,
-        cart__customer_id=customer_id
-    )
+    cart_item = get_object_or_404(CartItem,id=item_id,cart__customer_id=customer_id)
 
     if action == "increase":
         cart_item.quantity += 1
@@ -132,7 +124,6 @@ def update_cart_quantity(request, item_id):
         quantity = cart_item.quantity
         subtotal = cart_item.quantity * cart_item.product.price
 
-    # 🔥 Recalculate cart total safely
     cart_items = CartItem.objects.filter(cart__customer_id=customer_id)
     cart_total = sum(
         item.quantity * item.product.price for item in cart_items
@@ -152,24 +143,32 @@ def cart_preview(request):
     customer_id = request.session.get("user_id")
 
     if not customer_id:
-        return JsonResponse({"not_logged_in": True})
+        return JsonResponse({"logged_in": False})
 
     cart = Cart.objects.filter(customer_id=customer_id).first()
     if not cart:
-        return JsonResponse({"empty": True})
+        return JsonResponse({"logged_in": True, "items": [], "total": 0})
 
-    items = CartItem.objects.filter(cart=cart).select_related("product")
-    if not items.exists():
-        return JsonResponse({"empty": True})
+    items_qs = CartItem.objects.filter(cart=cart).select_related("product")
+    if not items_qs.exists():
+        return JsonResponse({"logged_in": True, "items": [], "total": 0})
 
-    data = []
-    for item in items:
-        data.append({
+    items = []
+    total = 0
+
+    for item in items_qs:
+        subtotal = item.product.price * item.quantity
+        total += subtotal
+
+        items.append({
             "name": item.product.name,
-            "price": float(item.product.price),
-            "qty": item.quantity,
-            "subtotal": float(item.product.price) * item.quantity,
-            "image": item.product.image.url if item.product.image else None
+            "quantity": item.quantity,
+            "subtotal": float(subtotal),
+            "image": item.product.image.url if item.product.image else ""
         })
 
-    return JsonResponse({"items": data})
+    return JsonResponse({
+        "logged_in": True,
+        "items": items,
+        "total": float(total)
+    })

@@ -87,10 +87,7 @@ def add_address(request):
 
 @nocache
 def payment_options(request, order_number):
-    order = Order.objects.filter(
-        order_number=order_number,
-        customer_id=request.session.get("user_id")
-    ).first()
+    order = Order.objects.filter(order_number=order_number,customer_id=request.session.get("user_id")).first()
     if not order:
         return redirect("cart_page")
     return render(request, "orders/payment_options.html", {
@@ -113,23 +110,17 @@ def confirm_payment(request):
         messages.error(request, "Invalid payment request.")
         return redirect("cart_page")
 
-    order = Order.objects.filter(
-        order_number=order_number,
-        customer_id=customer_id,
-        payment_status="pending"
-    ).first()
+    order = Order.objects.filter(order_number=order_number,customer_id=customer_id,payment_status="pending").first()
 
     if not order:
         messages.error(request, "Order not found.")
         return redirect("cart_page")
 
-    # ✅ Mark order confirmed
     order.payment_method = payment_method
     order.payment_status = "success"
     order.status = "paid"
     order.save(update_fields=["payment_method", "payment_status", "status"])
 
-    # ✅ NOW clear cart (correct place)
     cart = Cart.objects.filter(customer_id=customer_id).first()
     if cart:
         cart.items.all().delete()
@@ -140,10 +131,7 @@ def confirm_payment(request):
 
 @nocache
 def order_success(request, order_number):
-    order = Order.objects.filter(
-        order_number=order_number,
-        customer_id=request.session.get("user_id")
-    ).prefetch_related("items__product").first()
+    order = Order.objects.filter(order_number=order_number,customer_id=request.session.get("user_id")).prefetch_related("items__product").first()
     if not order:
         return redirect("product_list")
     return render(request, "orders/order_success.html", {"order": order, "hide_navitems": True})
@@ -153,9 +141,7 @@ def order_success(request, order_number):
 def my_orders(request):
     if not request.session.get("user_id"):
         return redirect("login")
-    orders = Order.objects.filter(
-        customer_id=request.session["user_id"]
-    ).prefetch_related("items__product").order_by("-created_at")
+    orders = Order.objects.filter(customer_id=request.session["user_id"]).prefetch_related("items__product").order_by("-created_at")
     return render(request, "orders/my_orders.html", {
         "orders": orders,
         "hide_navitems": True
@@ -164,10 +150,7 @@ def my_orders(request):
 
 @nocache
 def order_detail(request, order_number):
-    order = Order.objects.filter(
-        order_number=order_number,
-        customer_id=request.session.get("user_id")
-    ).prefetch_related("items__product").first()
+    order = Order.objects.filter(order_number=order_number,customer_id=request.session.get("user_id")).prefetch_related("items__product").first()
     if not order:
         messages.error(request, "Order not found.")
         return redirect("my_orders")
@@ -182,10 +165,5 @@ def download_invoice(request, order_number):
     if not request.session.get("user_id"):
         return HttpResponseForbidden("Login required")
 
-    order = get_object_or_404(
-        Order,
-        order_number=order_number,
-        customer_id=request.session["user_id"]
-    )
-
+    order = get_object_or_404(Order,order_number=order_number,customer_id=request.session["user_id"])
     return generate_invoice_pdf(order)

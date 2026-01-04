@@ -37,11 +37,19 @@
         <!-- SEARCH BOX -->
         <div class="right-icons d-flex align-items-center gap-3">
 
-            <form class="search">
-                <input class="form-control rounded-pill px-3"
-                       type="search"
-                       placeholder="Search for groceries, fruits, snacks...">
+            <form class="search position-relative" autocomplete="off">
+                <input
+                    id="search-input"
+                    class="form-control rounded-pill px-3"
+                    type="search"
+                    placeholder="Search for groceries, fruits, snacks..."
+                >
+
+                <!-- 🔥 LIVE SEARCH DROPDOWN -->
+                <div id="search-dropdown" class="search-dropdown shadow-sm"></div>
             </form>
+
+
 
             <!-- RIGHT ICONS -->
             <ul class="navbar-nav align-items-center gap-4 mb-0">
@@ -63,38 +71,37 @@
                     </a>
 
                     <!-- CART DROPDOWN (HOVER) -->
-                    <div class="cart-dropdown shadow">
+                    <div class="cart-dropdown shadow" >
 
+                        <!-- NOT LOGGED IN -->
                         {% if not request.session.user_id %}
-
-                            <!-- NOT LOGGED IN -->
-                            <div class="text-center text-muted small py-3">
-                                <i class="bi bi-lock me-1"></i>
-                                Please log in to see cart items.
+                            <div class="text-center py-3 text-muted">
+                                <i class="bi bi-lock fs-5"></i><br>
+                                Please login to see cart items
                             </div>
-
-                            <a href="{% url 'login' %}" class="btn btn-outline-primary btn-sm w-100">
-                                Login
-                            </a>
-
                         {% else %}
 
-                            <!-- LOGGED IN -->
-                            <div id="cart-hover-content" class="small text-muted">
-                                Loading...
+                            <!-- EMPTY CART -->
+                            <div id="cart-hover-empty" class="text-center py-3 text-muted d-none">
+                                Cart is empty
                             </div>
 
-                            <div id="cart-hover-total"
-                                class="fw-bold text-end mt-2 mb-2">
-                            </div>
+                            <!-- CART ITEMS -->
+                            <div id="cart-hover-items" class="d-flex flex-column gap-2">
 
-                            <a href="{% url 'cart_page' %}"
-                            class="btn btn-primary btn-sm w-100">
-                                View Cart
-                            </a>
+                                <div id="cart-hover-content"></div>
+
+                                <div id="cart-hover-total"
+                                    class="fw-bold text-end mt-2 mb-2">
+                                </div>
+
+                                <a href="{% url 'cart_page' %}"
+                                class="btn btn-primary btn-sm w-100">
+                                    View Cart
+                                </a>
+                            </div>
 
                         {% endif %}
-
                     </div>
 
                 </li>
